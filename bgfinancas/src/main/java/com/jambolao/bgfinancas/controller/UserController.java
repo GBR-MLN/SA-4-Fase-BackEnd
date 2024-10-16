@@ -20,48 +20,43 @@ import com.jambolao.bgfinancas.service.UserService;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin("http://localhost:5173")
 public class UserController {
 
     @Autowired
     private UserService service;
 
     @GetMapping
-    @CrossOrigin(origins = "http://localhost:8080", allowedHeaders = "*")
     public ResponseEntity<List<User>> listUsers() {
         List<User> users = service.listUsers();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
-    @CrossOrigin(origins = "http://localhost:8080", allowedHeaders = "*")
     public ResponseEntity<User> read(@PathVariable Long id) {
         User user = service.readUser(id);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/email/{email}")
-    @CrossOrigin(origins = "http://localhost:8080", allowedHeaders = "*")
     public ResponseEntity<User> readByEmail(@PathVariable String email) {
         User user = service.readUserByEmail(email);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:8080", allowedHeaders = "*")
     public ResponseEntity<User> create(@RequestBody User user) {
         User createdUser = service.createUser(user);
         return new ResponseEntity<User>(createdUser, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @CrossOrigin(origins = "http://localhost:8080", allowedHeaders = "*")
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
         User updatedUser = service.updateUser(id, user);
         return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{id}")
-    @CrossOrigin(origins = "http://localhost:8080", allowedHeaders = "*")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         service.deleteUser(id);
         return ResponseEntity.noContent().build();
