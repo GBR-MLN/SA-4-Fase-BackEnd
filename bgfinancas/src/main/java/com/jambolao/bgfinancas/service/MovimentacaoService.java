@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jambolao.bgfinancas.model.movimentacao.Movimentacao;
 import com.jambolao.bgfinancas.model.movimentacao.MovimentacaoRepository;
+// import com.jambolao.bgfinancas.model.user.User;
 
 @Service
 public class MovimentacaoService {
@@ -24,6 +25,11 @@ public class MovimentacaoService {
     @Transactional
     public List<Movimentacao> listMovimentacoes() {
         return(List<Movimentacao>) repository.findAll();
+    }
+
+    @Transactional
+    public List<Movimentacao> listByUserId(Long userId) {
+        return repository.findByUserId(userId);
     }
 
     @Transactional

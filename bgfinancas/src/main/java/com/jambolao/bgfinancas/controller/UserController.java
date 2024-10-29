@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jambolao.bgfinancas.model.user.User;
 import com.jambolao.bgfinancas.service.UserService;
 
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 @RequestMapping("/users")
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserController {
 
     @Autowired
@@ -61,4 +63,44 @@ public class UserController {
         service.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody User user, HttpSession session) {
+        // Verifica se o email fornecido corresponde a algum usuário existente
+        User existingUser = service.readUserByEmail(user.getEmail());
+
+        if (existingUser == null) {
+            // Retorna 404 se o usuário não for encontrado no banco de dados
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado");
+        }
+
+        // Verifica se a senha está correta
+        User loggedInUser = service.login(user.getEmail(), user.getSenha());
+
+        if (loggedInUser != null) {
+            // Armazena o usuário na sessão
+            session.setAttribute("user", loggedInUser);
+            return ResponseEntity.ok("Login realizado com sucesso");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha incorretos");
+        }
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<User> getUserProfile(HttpSession session) {
+        User loggedInUser = (User) session.getAttribute("user");
+
+        if (loggedInUser != null) {
+            return ResponseEntity.ok(loggedInUser);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate(); // Invalida a sessão
+        return ResponseEntity.ok("Logout realizado com sucesso");
+    }
+
 }
